@@ -1,0 +1,14 @@
+{
+    "name": "mini-next",
+    "version": "0.0.1",
+    "main": "index.js",
+    "bin": {
+      "next": "./bin/next.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0"
+    }
+  }
+  

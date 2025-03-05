@@ -1,0 +1,8 @@
+{
+    "name": "create-mini-next-app",
+    "version": "0.0.1",
+    "bin": {
+      "create-mini-next-app": "./cli.js"
+    }
+  }
+  
