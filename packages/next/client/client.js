@@ -22,5 +22,5 @@ function initClientRouter() {
     });
   }
   
-  module.exports = { initClientRouter };
+  export { initClientRouter };
   

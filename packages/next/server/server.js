@@ -1,9 +1,15 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const { parseRoutes } = require('../router');
+import './babel-register.js';
+import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import { parseRoutes } from '../router/router.js';
+
+// Create __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const isDev = process.argv.includes('--dev');
 const app = express();
@@ -23,7 +29,10 @@ if (fs.existsSync(publicDir)) {
 
 // Generic request handler
 app.get('*', async (req, res) => {
+  console.log("GETTING REACT")
   const { pageName, params } = parseRoutes(req.path);
+  console.log("pageDir is: ", pagesDir);
+  console.log("pageName is: ", pageName);
 
   if (!pageName) {
     return res.status(404).send('Page Not Found');
@@ -35,24 +44,31 @@ app.get('*', async (req, res) => {
     if (!fs.existsSync(apiPath)) {
       return res.status(404).send('API route not found');
     }
-    const apiHandler = require(apiPath);
+    const apiModule = await import(apiPath);
+    const apiHandler = apiModule.default || apiModule;
     return apiHandler(req, res);
   }
-
+  
   // SSR for a normal page
-  const pagePath = path.join(pagesDir, pageName + '.js');
-  if (!fs.existsSync(pagePath)) {
+  const pagePathjs = path.join(pagesDir, pageName + '.js');
+  const pagePathjsx = path.join(pagesDir, pageName + '.jsx');
+  let page;
+  if ((!fs.existsSync(pagePathjs)) && (!fs.existsSync(pagePathjsx))) {
     return res.status(404).send('Page Not Found');
+  } else if (fs.existsSync(pagePathjs)){
+    page = await import(pagePathjs);
+  }else{
+    page = await import(pagePathjsx);
   }
-  const PageComponent = require(pagePath);
+  
 
   // Optional getServerSideProps
   let props = {};
-  if (PageComponent.getServerSideProps) {
-    props = await PageComponent.getServerSideProps({ query: params });
+  if (page.getServerSideProps) {
+    props = await page.getServerSideProps({ query: params });
   }
 
-  const element = React.createElement(PageComponent.default || PageComponent, props);
+  const element = React.createElement(page.default || page, props);
   const html = ReactDOMServer.renderToString(element);
 
   const fullHtml = `

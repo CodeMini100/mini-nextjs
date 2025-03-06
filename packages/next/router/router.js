@@ -1,10 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // parseRoutes("/about") => { pageName: "about", params: {} }
 // parseRoutes("/api/hello") => { pageName: "api/hello", params: {} }
 // parseRoutes("/hello") => tries for exact 'hello.js', else tries [slug].js
 function parseRoutes(urlPath) {
+  console.log(urlPath)
   let slug = urlPath.replace(/^\/+/, ''); // remove leading slash(es)
   if (slug === '') slug = 'index'; // root => index.js
 
@@ -16,6 +21,11 @@ function parseRoutes(urlPath) {
   // Check if there's an exact .js file
   const exactFile = path.join(pagesDir, slug + '.js');
   if (fs.existsSync(exactFile)) {
+    return { pageName: slug, params: {} };
+  }
+  // Check if there's an exact .jsx file
+  const exactFilejsx = path.join(pagesDir, slug + '.jsx');
+  if (fs.existsSync(exactFilejsx)) {
     return { pageName: slug, params: {} };
   }
 
@@ -41,4 +51,4 @@ function parseRoutes(urlPath) {
   return { pageName: null, params: {} };
 }
 
-module.exports = { parseRoutes };
+export { parseRoutes };
