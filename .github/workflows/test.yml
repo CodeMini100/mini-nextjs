@@ -1,0 +1,29 @@
+   name: Mini-NextJS Tests
+
+   on:
+     push:
+       branches: [ main, master ]
+     pull_request:
+       branches: [ main, master ]
+
+   jobs:
+     test:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Checkout repository
+           uses: actions/checkout@v3
+         
+         - name: Set up Node.js
+           uses: actions/setup-node@v3
+           with:
+             node-version: 18
+             cache: 'npm'
+         
+         - name: Install dependencies
+           run: npm install
+         
+         - name: Install workspace dependencies
+           run: npm install -w packages/next
+           
+         - name: Run tests
+           run: npm test
