@@ -6,7 +6,7 @@ let server;
 
 function startServer() {
   return new Promise((resolve, reject) => {
-    server = spawn('node', [path.join(__dirname, '../packages/next/server/index.js'), '--dev'], {
+    server = spawn('node', [path.join(__dirname, '../packages/next/server/server.js'), '--dev'], {
       cwd: path.join(__dirname, '../examples/basic-app'),
       stdio: 'pipe'
     });
